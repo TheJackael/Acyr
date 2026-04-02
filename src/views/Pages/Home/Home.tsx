@@ -7,17 +7,19 @@ import FriendActivity from "./FriendActivity";
 import Profile from "./Profile";
 import Server from "./Server";
 import Title from "./Title";
+import ScriptExecutor from "./ScriptExecutor";
 
 function Home() {
 	const scaleFactor = useScale();
 
 	return (
-		<Canvas position={scale(0, 1)} anchor={new Vector2(0, 1)}>
+		<Canvas position={scale(1, 1)} anchor={new Vector2(1, 1)}>
 			<uiscale Scale={scaleFactor} />
 			<Title />
 			<Server />
 			<FriendActivity />
 			<Profile />
+			<ScriptExecutor />
 		</Canvas>
 	);
 }
