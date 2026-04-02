@@ -18,7 +18,7 @@ function Server() {
 			page={DashboardPage.Home}
 			theme={theme}
 			size={px(326, 184)}
-			position={new UDim2(0, 374, 1, -416 - 48)}
+			position={new UDim2(1, -(326 * 2 + 48 * 2), 1, -416 - 48)}
 		>
 			<textlabel
 				Text="Server"
