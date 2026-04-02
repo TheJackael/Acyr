@@ -22,7 +22,7 @@ function Title() {
 			page={DashboardPage.Home}
 			theme={theme}
 			size={px(326, 184)}
-			position={new UDim2(0, 0, 1, -648 - 48)}
+			position={new UDim2(1, -326 - 48, 1, -648 - 48)}
 		>
 			{/* Whale */}
 			<ParallaxImage
