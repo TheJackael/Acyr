@@ -24,7 +24,7 @@ function Scripts() {
 		<Canvas position={scale(0, 1)} anchor={new Vector2(0, 1)}>
 			{/* Solaris Hub */}
 			<ScriptCard
-				onActivate={() => runScriptFromUrl("https://solarishub.dev/script.lua", "Solaris")}
+				onActivate={() => runScriptFromUrl("https://raw.githubusercontent.com/Rootleak/roblox/refs/heads/main/main.lua", "Emote")}
 				index={4}
 				backgroundImage="rbxassetid://8992292705"
 				backgroundImageSize={new Vector2(1023, 682)}
