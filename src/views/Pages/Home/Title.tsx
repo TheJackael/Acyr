@@ -49,8 +49,8 @@ function Title() {
 				<Label index={0} text="Acyr" font={Enum.Font.GothamBlack} size={20} position={px(0, 0)} />
 				<Label index={1} text={VERSION_TAG} position={px(0, 40)} />
 				<Label index={2} text="By Acy" position={px(0, 63)} transparency={0.15} />
-				<Label index={3} text="" position={px(0, 86)} transparency={0.3} />
-				<Label index={4} text="richie0866/orca" position={new UDim2(0, 0, 1, -40)} transparency={0.45} />
+				<Label index={3} text="Subscribe to AcyScripts" position={px(0, 86)} transparency={0.3} />
+				<Label index={4} text=":D" position={new UDim2(0, 0, 1, -40)} transparency={0.45} />
 			</Canvas>
 		</Card>
 	);
