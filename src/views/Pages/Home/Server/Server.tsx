@@ -1,86 +1,62 @@
 import Roact from "@rbxts/roact";
-import { hooked } from "@rbxts/roact-hooked";
-import { Players } from "@rbxts/services";
+import { hooked, useState } from "@rbxts/roact-hooked";
+import Canvas from "components/Canvas";
 import Card from "components/Card";
-import { IS_DEV } from "constants";
 import { useTheme } from "hooks/use-theme";
 import { DashboardPage } from "store/models/dashboard.model";
 import { px } from "utils/udim2";
-import ServerAction from "views/Pages/Home/Server/ServerAction";
-import StatusLabel from "./StatusLabel";
 
-function Server() {
-	const theme = useTheme("home").server;
+function ScriptExecutor() {
+	const theme = useTheme("home").profile;
+	const [script, setScript] = useState("");
+	const [output, setOutput] = useState("");
+
+	const handleExecute = () => {
+		// Execute script logic here
+		setOutput("Script executed successfully!");
+	};
 
 	return (
 		<Card
-			index={2}
+			index={3}
 			page={DashboardPage.Home}
 			theme={theme}
-			size={px(326, 184)}
-			position={new UDim2(1, -(326 * 2 + 48 * 2), 1, -416 - 48)}
+			size={px(326, 250)}
+			position={new UDim2(1, -(326 * 3 + 48 * 3), 0, 48)}
 		>
 			<textlabel
-				Text="Server"
+				Text="Script Executor"
 				Font="GothamBlack"
 				TextSize={20}
 				TextColor3={theme.foreground}
-				TextXAlignment="Left"
-				TextYAlignment="Top"
 				Position={px(24, 24)}
 				BackgroundTransparency={1}
 			/>
-
-			{/* Server status */}
-			<StatusLabel
-				index={0}
-				offset={69}
-				units="players"
-				getValue={() => `${Players.GetPlayers().size()} / ${Players.MaxPlayers}`}
-			/>
-			<StatusLabel
-				index={1}
-				offset={108}
-				units="elapsed"
-				getValue={() => {
-					const uptime = IS_DEV ? os.clock() : time();
-					const days = math.floor(uptime / 86400);
-					const hours = math.floor((uptime - days * 86400) / 3600);
-					const minutes = math.floor((uptime - days * 86400 - hours * 3600) / 60);
-					const seconds = math.floor(uptime - days * 86400 - hours * 3600 - minutes * 60);
-					return days > 0
-						? `${days} days`
-						: hours > 0
-						? `${hours} hours`
-						: minutes > 0
-						? `${minutes} minutes`
-						: `${seconds} seconds`;
-				}}
-			/>
-			<StatusLabel
-				index={2}
-				offset={147}
-				units="ping"
-				getValue={() => `${math.round(Players.LocalPlayer.GetNetworkPing() * 1000)} ms`}
+			
+			{/* Input area */}
+			<textbox
+				Text={script}
+				PlaceholderText="Enter your script here..."
+				Position={px(24, 60)}
+				Size={px(278, 120)}
+				BackgroundColor3={theme.background}
+				TextColor3={theme.foreground}
+				[Roact.Change.Text] = {(rbx: TextBox) => setScript(rbx.Text)}
 			/>
 
-			{/* Server actions */}
-			<ServerAction
-				action="switchServer"
-				hint="<font face='GothamBlack'>Switch</font> to a different server"
-				icon="rbxassetid://8992259774"
-				size={px(66, 50)}
-				position={new UDim2(1, -66 - 24, 1, -100 - 16 - 12)}
-			/>
-			<ServerAction
-				action="rejoinServer"
-				hint="<font face='GothamBlack'>Rejoin</font> this server"
-				icon="rbxassetid://8992259894"
-				size={px(66, 50)}
-				position={new UDim2(1, -66 - 24, 1, -50 - 16)}
+			{/* Execute button */}
+			<textbutton
+				Text="Execute"
+				Position={px(24, 190)}
+				Size={px(278, 40)}
+				BackgroundColor3={theme.foreground}
+				TextColor3={theme.background}
+				Font="GothamBold"
+				TextSize={14}
+				[Roact.Event.MouseButton1Click] = {() => handleExecute()}
 			/>
 		</Card>
 	);
 }
 
-export default hooked(Server);
+export default hooked(ScriptExecutor);
