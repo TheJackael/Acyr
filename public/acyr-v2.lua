@@ -1294,8 +1294,16 @@ function Modules.noodleArms(enabled)
     if humanoid then
         local armWidthScale = humanoid:FindFirstChild("BodyWidthScale")
         local armDepthScale = humanoid:FindFirstChild("BodyDepthScale")
-        if armWidthScale then armWidthScale.Value = enabled and 0.2 or 1 end
-        if armDepthScale then armDepthScale.Value = enabled and 0.2 or 1 end
+        if enabled then
+            if armWidthScale then armWidthScale.Value = 0.2 end
+            if armDepthScale then armDepthScale.Value = 0.2 end
+        else
+            local restoreValue = 1
+            if State.tiny then restoreValue = 0.3
+            elseif State.giant then restoreValue = 3 end
+            if armWidthScale then armWidthScale.Value = restoreValue end
+            if armDepthScale then armDepthScale.Value = restoreValue end
+        end
     end
     Utilities.notification("Acyr v2", enabled and "Noodle Arms ON" or "Noodle Arms OFF", 2)
 end
