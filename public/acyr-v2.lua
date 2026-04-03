@@ -151,10 +151,10 @@ local State = {
     staff_detector = Settings.staff_detector or false,
     
     -- Settings
-    notifications = (Settings.notifications ~= nil) and Settings.notifications or true,
-    arraylist = (Settings.arraylist ~= nil) and Settings.arraylist or true,
+    notifications = Settings.notifications ~= false,
+    arraylist = Settings.arraylist ~= false,
     target_hud = Settings.target_hud or false,
-    click_sounds = (Settings.click_sounds ~= nil) and Settings.click_sounds or true,
+    click_sounds = Settings.click_sounds ~= false,
     
     -- Fun
     big_head = Settings.big_head or false,
