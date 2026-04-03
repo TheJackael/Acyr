@@ -1,16 +1,18 @@
 --[[
-  ╔══════════════════════════════════════════════════════════════╗
-  ║             A C Y R   v 2   -   P R O F E S S I O N A L     ║
-  ║                Made by Acy - 1800+ Lines                     ║
-  ║           Full UI Library + Advanced Modules                 ║
-  ║           github.com/TheJackael/Acyr                         ║
-  ╚══════════════════════════════════════════════════════════════╝
+  ======================================================================
+  |             A C Y R   v 2   -   P R O F E S S I O N A L            |
+  |                Made by Acy - Full UI + Modules                     |
+  |           Full UI Library + Advanced Modules                       |
+  |           github.com/TheJackael/Acyr                               |
+  ======================================================================
 
   FEATURES:
   - Professional full-screen UI with smooth staggered animations
-  - 1800+ lines of code
   - Advanced modules: Fly, Noclip, Speed, XRay, Blink, ESP, Aimbot
-  - Customizable sliders, toggles, dropdowns
+  - Settings tab with notifications, version info, and more
+  - Fun tab with harmless cosmetic features
+  - Click sounds on all interactions
+  - Customizable sliders, toggles
   - Persistent settings
   - Modern design with gradients and effects
   - ArrayList sidebar showing active modules
@@ -22,9 +24,9 @@
   - Delete: Panic/Close
 ]]
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
 --  SECTION 1: CORE SERVICES & INITIALIZATION
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -33,14 +35,15 @@ local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
+local SoundService = game:GetService("SoundService")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerMouse = LocalPlayer:GetMouse()
 local Camera = workspace.CurrentCamera
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
 --  SECTION 2: CONSTANTS & CONFIGURATION
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
 
 local CONFIG = {
     SAVE_FILE = "AcyrV2_settings.json",
@@ -49,44 +52,50 @@ local CONFIG = {
     STAGGER_DELAY = 0.06,
     BORDER_RADIUS = 8,
     HEADER_HEIGHT = 40,
-    SECTION_WIDTH = 200,
+    SECTION_WIDTH = 190,
     SECTION_HEIGHT = 520,
     ARRAYLIST_WIDTH = 160,
+    VERSION = "2.1.0",
 }
 
 local COLORS = {
-    -- Primary
     background = Color3.fromRGB(15, 15, 20),
     darkBG = Color3.fromRGB(10, 10, 15),
     panel = Color3.fromRGB(28, 28, 38),
     panelHover = Color3.fromRGB(38, 38, 52),
     border = Color3.fromRGB(50, 50, 70),
     
-    -- Category Colors (pink/magenta theme to match reference)
     combat = Color3.fromRGB(220, 90, 140),
     movement = Color3.fromRGB(100, 200, 220),
     render = Color3.fromRGB(160, 120, 220),
     player = Color3.fromRGB(220, 160, 80),
-    other = Color3.fromRGB(220, 120, 180),
+    settings = Color3.fromRGB(120, 180, 120),
+    fun = Color3.fromRGB(255, 160, 60),
     
-    -- Active module highlight (pink like reference)
     active = Color3.fromRGB(255, 130, 180),
     activeGlow = Color3.fromRGB(255, 100, 160),
     
-    -- Text
     text = Color3.fromRGB(200, 200, 210),
     textDark = Color3.fromRGB(100, 100, 110),
     white = Color3.fromRGB(255, 255, 255),
     
-    -- Accents
     success = Color3.fromRGB(100, 200, 100),
     warning = Color3.fromRGB(220, 160, 80),
     error = Color3.fromRGB(220, 100, 100),
 }
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- Sound IDs for click effects
+local SOUNDS = {
+    CLICK_ON = "rbxassetid://6895079853",
+    CLICK_OFF = "rbxassetid://6895079853",
+    HOVER = "rbxassetid://10066936758",
+    OPEN = "rbxassetid://6895079853",
+    CLOSE = "rbxassetid://6895079853",
+}
+
+-- ====================================================================
 --  SECTION 3: STATE MANAGEMENT
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
 
 local function saveSettings(settings)
     pcall(function()
@@ -111,12 +120,8 @@ local State = {
     -- Combat
     autoclicker = Settings.autoclicker or false,
     autoclicker_cps = Settings.autoclicker_cps or 10,
-    triggerbot = Settings.triggerbot or false,
     aimbot = Settings.aimbot or false,
     aimbot_fov = Settings.aimbot_fov or 100,
-    silent_aim = Settings.silent_aim or false,
-    reach = Settings.reach or false,
-    reach_dist = Settings.reach_dist or 6,
     
     -- Movement
     fly = Settings.fly or false,
@@ -133,11 +138,9 @@ local State = {
     esp = Settings.esp or false,
     esp_distance = Settings.esp_distance or 1000,
     xray = Settings.xray or false,
-    chams = Settings.chams or false,
     fullbright = Settings.fullbright or false,
     stretched = Settings.stretched or false,
     stretched_fov = Settings.stretched_fov or 120,
-    tracers = Settings.tracers or false,
     
     -- Player
     third_person = Settings.third_person or false,
@@ -145,26 +148,33 @@ local State = {
     godmode = Settings.godmode or false,
     invisible = Settings.invisible or false,
     air_jump = Settings.air_jump or false,
-    
-    -- Other
-    auto_reload = Settings.auto_reload or false,
-    target_hud = Settings.target_hud or false,
-    arraylist = (Settings.arraylist ~= nil) and Settings.arraylist or true,
-    anti_flashbang = Settings.anti_flashbang or false,
     staff_detector = Settings.staff_detector or false,
-    device_spoof = Settings.device_spoof or false,
-    anti_katana = Settings.anti_katana or false,
-    fast_shoot = Settings.fast_shoot or false,
-    auto_play = Settings.auto_play or false,
+    
+    -- Settings
+    notifications = (Settings.notifications ~= nil) and Settings.notifications or true,
+    arraylist = (Settings.arraylist ~= nil) and Settings.arraylist or true,
+    target_hud = Settings.target_hud or false,
+    click_sounds = (Settings.click_sounds ~= nil) and Settings.click_sounds or true,
+    
+    -- Fun
+    big_head = Settings.big_head or false,
+    tiny = Settings.tiny or false,
+    giant = Settings.giant or false,
+    rainbow = Settings.rainbow or false,
+    spin = Settings.spin or false,
+    upside_down = Settings.upside_down or false,
+    headless = Settings.headless or false,
+    disco = Settings.disco or false,
+    noodle_arms = Settings.noodle_arms or false,
 }
 
 local function persistState()
     saveSettings(State)
 end
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
 --  SECTION 4: UTILITY FUNCTIONS
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
 
 local Utilities = {}
 
@@ -213,6 +223,7 @@ function Utilities.tweenBack(instance, duration, properties)
 end
 
 function Utilities.notification(title, message, duration)
+    if not State.notifications then return end
     pcall(function()
         game:GetService("StarterGui"):SetCore("SendNotification", {
             Title = title,
@@ -226,9 +237,22 @@ function Utilities.getDistance(p1, p2)
     return (p1 - p2).Magnitude
 end
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function Utilities.playSound(soundId, volume, pitch)
+    if not State.click_sounds then return end
+    pcall(function()
+        local sound = Instance.new("Sound")
+        sound.SoundId = soundId
+        sound.Volume = volume or 0.5
+        sound.PlaybackSpeed = pitch or 1.2
+        sound.Parent = SoundService
+        sound:Play()
+        game:GetService("Debris"):AddItem(sound, 2)
+    end)
+end
+
+-- ====================================================================
 --  SECTION 5: UI LIBRARY (CUSTOM)
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
 
 local UILibrary = {}
 UILibrary.Elements = {}
@@ -268,6 +292,7 @@ function UILibrary.createButton(text, size, color, callback)
         Utilities.tween(button, 0.15, {
             BackgroundColor3 = COLORS.panelHover,
         })
+        Utilities.playSound(SOUNDS.HOVER, 0.15, 1.5)
     end)
     
     button.MouseLeave:Connect(function()
@@ -277,6 +302,7 @@ function UILibrary.createButton(text, size, color, callback)
     end)
     
     button.MouseButton1Click:Connect(function()
+        Utilities.playSound(SOUNDS.CLICK_ON, 0.4, 1.0)
         if callback then callback() end
     end)
     
@@ -300,7 +326,7 @@ function UILibrary.createToggle(label, initialValue, color, callback)
         Transparency = isActive and 0.2 or 0.6,
     }, container)
     
-    local labelText = Utilities.createInstance("TextLabel", {
+    Utilities.createInstance("TextLabel", {
         Text = label,
         TextSize = 13,
         TextColor3 = COLORS.white,
@@ -340,7 +366,6 @@ function UILibrary.createToggle(label, initialValue, color, callback)
         end
     end
     
-    -- Make the whole container clickable
     local clickButton = Utilities.createInstance("TextButton", {
         Text = "",
         Size = UDim2.new(1, 0, 1, 0),
@@ -352,6 +377,11 @@ function UILibrary.createToggle(label, initialValue, color, callback)
     clickButton.MouseButton1Click:Connect(function()
         state = not state
         updateVisual()
+        if state then
+            Utilities.playSound(SOUNDS.CLICK_ON, 0.5, 1.3)
+        else
+            Utilities.playSound(SOUNDS.CLICK_OFF, 0.4, 0.9)
+        end
         if callback then callback(state) end
     end)
     
@@ -361,6 +391,7 @@ function UILibrary.createToggle(label, initialValue, color, callback)
                 BackgroundColor3 = COLORS.panelHover,
             })
         end
+        Utilities.playSound(SOUNDS.HOVER, 0.1, 1.5)
     end)
     
     container.MouseLeave:Connect(function()
@@ -437,7 +468,6 @@ function UILibrary.createSlider(label, minValue, maxValue, initialValue, callbac
     
     Utilities.createInstance("UICorner", {CornerRadius = UDim.new(1, 0)}, thumb)
     
-    -- Glow on thumb
     Utilities.createInstance("UIStroke", {
         Color = COLORS.active,
         Thickness = 2,
@@ -465,6 +495,7 @@ function UILibrary.createSlider(label, minValue, maxValue, initialValue, callbac
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
             updateSlider(input.Position.X)
+            Utilities.playSound(SOUNDS.CLICK_ON, 0.3, 1.1)
         end
     end)
     
@@ -500,7 +531,6 @@ function UILibrary.createSection(title, color)
     
     Utilities.createInstance("UICorner", {CornerRadius = UDim.new(0, CONFIG.BORDER_RADIUS)}, header)
     
-    -- Gradient on header
     Utilities.createInstance("UIGradient", {
         Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
@@ -549,16 +579,33 @@ function UILibrary.createSection(title, color)
     return section, content
 end
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  SECTION 6: FEATURE MODULES - PART 1 (MOVEMENT)
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function UILibrary.createInfoLabel(text, color)
+    local label = Utilities.createInstance("TextLabel", {
+        Text = text,
+        TextSize = 12,
+        TextColor3 = color or COLORS.textDark,
+        Font = Enum.Font.Gotham,
+        BackgroundColor3 = COLORS.panel,
+        BackgroundTransparency = 0.3,
+        BorderSizePixel = 0,
+        Size = UDim2.new(1, 0, 0, 28),
+        TextXAlignment = Enum.TextXAlignment.Center,
+    })
+    
+    Utilities.createInstance("UICorner", {CornerRadius = UDim.new(0, 6)}, label)
+    
+    return label
+end
+
+-- ====================================================================
+--  SECTION 6: FEATURE MODULES - MOVEMENT
+-- ====================================================================
 
 local Modules = {}
 
--- FLY MODULE (fully working with BodyVelocity + BodyGyro)
+-- FLY MODULE
 local flyConnection, flyBodyVelocity, flyBodyGyro
 function Modules.fly(enabled)
-    -- Cleanup previous
     if flyConnection then flyConnection:Disconnect() flyConnection = nil end
     if flyBodyVelocity then flyBodyVelocity:Destroy() flyBodyVelocity = nil end
     if flyBodyGyro then flyBodyGyro:Destroy() flyBodyGyro = nil end
@@ -626,7 +673,7 @@ function Modules.fly(enabled)
     end
 end
 
--- NOCLIP MODULE (fully working - disables collision every frame)
+-- NOCLIP MODULE
 local noclipConnection
 function Modules.noclip(enabled)
     if noclipConnection then noclipConnection:Disconnect() noclipConnection = nil end
@@ -645,7 +692,6 @@ function Modules.noclip(enabled)
         
         Utilities.notification("Acyr v2", "Noclip enabled", 2)
     else
-        -- Re-enable collision on character parts
         local character = Utilities.getCharacter()
         if character then
             for _, part in pairs(character:GetDescendants()) do
@@ -658,13 +704,12 @@ function Modules.noclip(enabled)
     end
 end
 
--- SPEED MODULE (fully working - modifies WalkSpeed)
+-- SPEED MODULE
 local speedConnection
 function Modules.speed(enabled)
     if speedConnection then speedConnection:Disconnect() speedConnection = nil end
     
     if enabled then
-        -- Continuously set speed to override any game resets
         speedConnection = RunService.Heartbeat:Connect(function()
             local humanoid = Utilities.getHumanoid()
             if humanoid then
@@ -681,7 +726,7 @@ function Modules.speed(enabled)
     end
 end
 
--- SPIDER MODULE (Wall walk)
+-- SPIDER MODULE
 local spiderConnection
 function Modules.spider(enabled)
     if spiderConnection then spiderConnection:Disconnect() spiderConnection = nil end
@@ -689,8 +734,7 @@ function Modules.spider(enabled)
     if enabled then
         spiderConnection = RunService.Stepped:Connect(function()
             local hrp = Utilities.getHumanoidRootPart()
-            local humanoid = Utilities.getHumanoid()
-            if not hrp or not humanoid then return end
+            if not hrp then return end
             
             local moveDirection = Vector3.new(0, 0, 0)
             
@@ -719,9 +763,7 @@ function Modules.spider(enabled)
     end
 end
 
--- BLINK MODULE (Server-side stationary, client-side moving)
--- The player's server position stays anchored while the client moves freely.
--- When disabled, the player snaps back to the server position.
+-- BLINK MODULE
 local blinkData = {
     serverPosition = nil,
     serverCFrame = nil,
@@ -731,7 +773,6 @@ local blinkRenderConnection
 local blinkSteppedConnection
 
 function Modules.blink(enabled)
-    -- Cleanup previous connections
     if blinkRenderConnection then blinkRenderConnection:Disconnect() blinkRenderConnection = nil end
     if blinkSteppedConnection then blinkSteppedConnection:Disconnect() blinkSteppedConnection = nil end
     
@@ -739,23 +780,17 @@ function Modules.blink(enabled)
         local hrp = Utilities.getHumanoidRootPart()
         if not hrp then return end
         
-        -- Save server-side position
         blinkData.serverPosition = hrp.Position
         blinkData.serverCFrame = hrp.CFrame
         blinkData.isActive = true
         
-        -- Server-side: Keep the character anchored at the original position
-        -- We use Stepped (physics step) to continuously reset the network owner's position
         blinkSteppedConnection = RunService.Stepped:Connect(function()
             local hrpCheck = Utilities.getHumanoidRootPart()
             if not hrpCheck or not blinkData.isActive then return end
-            
-            -- Anchor on the physics side to keep server position fixed
             hrpCheck.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
             hrpCheck.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
         end)
         
-        -- Client-side: Move the character visually using RenderStepped (client only)
         blinkRenderConnection = RunService.RenderStepped:Connect(function(dt)
             local hrp2 = Utilities.getHumanoidRootPart()
             if not hrp2 or not blinkData.isActive then return end
@@ -781,7 +816,6 @@ function Modules.blink(enabled)
             
             if moveDirection.Magnitude > 0 then
                 moveDirection = moveDirection.Unit
-                -- Move client-side CFrame directly (server doesn't see this)
                 hrp2.CFrame = hrp2.CFrame + (moveDirection * speed * dt)
             end
         end)
@@ -789,18 +823,12 @@ function Modules.blink(enabled)
         Utilities.notification("Acyr v2", "Blink enabled - Server stays put, you move freely", 3)
     else
         blinkData.isActive = false
-        
-        -- Snap back to server position
         if blinkData.serverCFrame then
             local hrp = Utilities.getHumanoidRootPart()
-            if hrp then
-                hrp.CFrame = blinkData.serverCFrame
-            end
+            if hrp then hrp.CFrame = blinkData.serverCFrame end
         end
-        
         blinkData.serverPosition = nil
         blinkData.serverCFrame = nil
-        
         Utilities.notification("Acyr v2", "Blink disabled - Snapped back", 2)
     end
 end
@@ -819,7 +847,6 @@ function Modules.bunnyHop(enabled)
                 end
             end
         end)
-        
         Utilities.notification("Acyr v2", "Bunny hop enabled", 2)
     else
         Utilities.notification("Acyr v2", "Bunny hop disabled", 2)
@@ -838,16 +865,15 @@ function Modules.airJump(enabled)
                 humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
             end
         end)
-        
         Utilities.notification("Acyr v2", "Air Jump enabled", 2)
     else
         Utilities.notification("Acyr v2", "Air Jump disabled", 2)
     end
 end
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  SECTION 7: FEATURE MODULES - PART 2 (COMBAT & RENDER)
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
+--  SECTION 7: FEATURE MODULES - COMBAT & RENDER
+-- ====================================================================
 
 -- AUTOCLICKER MODULE
 local autoclickerConnection
@@ -869,7 +895,6 @@ function Modules.autoClicker(enabled)
                 end)
             end
         end)
-        
         Utilities.notification("Acyr v2", "AutoClicker enabled (" .. cps .. " CPS)", 2)
     else
         Utilities.notification("Acyr v2", "AutoClicker disabled", 2)
@@ -886,7 +911,6 @@ function Modules.esp(enabled)
         
         local function createESPBox(player)
             if player == LocalPlayer or not player.Character then return end
-            
             Utilities.createInstance("SelectionBox", {
                 Adornee = player.Character,
                 Color3 = COLORS.movement,
@@ -905,14 +929,13 @@ function Modules.esp(enabled)
                 if State.esp then createESPBox(player) end
             end)
         end)
-        
         Utilities.notification("Acyr v2", "ESP enabled", 2)
     else
         Utilities.notification("Acyr v2", "ESP disabled", 2)
     end
 end
 
--- XRAY MODULE (fully working - makes all parts transparent)
+-- XRAY MODULE
 local xrayParts = {}
 function Modules.xray(enabled)
     if enabled then
@@ -925,7 +948,6 @@ function Modules.xray(enabled)
                 end
             end
         end
-        
         Utilities.notification("Acyr v2", "XRay enabled - See through walls", 2)
     else
         for part, originalTransparency in pairs(xrayParts) do
@@ -957,7 +979,7 @@ function Modules.fullbright(enabled)
     end
 end
 
--- STRETCHED RESOLUTION MODULE (fully working - changes FOV)
+-- STRETCHED RESOLUTION MODULE
 function Modules.stretched(enabled)
     if enabled then
         Camera.FieldOfView = State.stretched_fov
@@ -1009,21 +1031,10 @@ function Modules.aimbot(enabled)
                 end
             end
         end)
-        
         Utilities.notification("Acyr v2", "Aimbot enabled", 2)
     else
         Utilities.notification("Acyr v2", "Aimbot disabled", 2)
     end
-end
-
--- SILENT AIM MODULE
-function Modules.silentAim(enabled)
-    Utilities.notification("Acyr v2", enabled and "Silent Aim enabled (game dependent)" or "Silent Aim disabled", 2)
-end
-
--- REACH MODULE
-function Modules.reach(enabled)
-    Utilities.notification("Acyr v2", enabled and "Reach enabled" or "Reach disabled", 2)
 end
 
 -- ANTI KNOCKBACK MODULE
@@ -1086,28 +1097,6 @@ function Modules.invisible(enabled)
     Utilities.notification("Acyr v2", enabled and "Invisible enabled" or "Invisible disabled", 2)
 end
 
--- ANTI FLASHBANG MODULE
-local antiFlashConnection
-function Modules.antiFlashbang(enabled)
-    if antiFlashConnection then antiFlashConnection:Disconnect() antiFlashConnection = nil end
-    
-    if enabled then
-        antiFlashConnection = RunService.Heartbeat:Connect(function()
-            for _, effect in pairs(Lighting:GetChildren()) do
-                if effect:IsA("ColorCorrectionEffect") then
-                    effect.Brightness = math.min(effect.Brightness, 0.1)
-                end
-                if effect:IsA("BloomEffect") then
-                    effect.Intensity = math.min(effect.Intensity, 0.1)
-                end
-            end
-        end)
-        Utilities.notification("Acyr v2", "Anti Flashbang enabled", 2)
-    else
-        Utilities.notification("Acyr v2", "Anti Flashbang disabled", 2)
-    end
-end
-
 -- STAFF DETECTOR MODULE
 local staffDetectorConnection
 function Modules.staffDetector(enabled)
@@ -1115,33 +1104,192 @@ function Modules.staffDetector(enabled)
     
     if enabled then
         local function checkPlayer(player)
-            if player.MembershipType == Enum.MembershipType.Premium then
-                -- Check for admin-like names or groups
-                pcall(function()
-                    if player:GetRankInGroup(game.CreatorId) > 0 then
-                        Utilities.notification("STAFF ALERT", player.Name .. " is a staff member!", 5)
-                    end
-                end)
-            end
+            pcall(function()
+                if player:GetRankInGroup(game.CreatorId) > 0 then
+                    Utilities.notification("STAFF ALERT", player.Name .. " is a staff member!", 5)
+                end
+            end)
         end
         
         for _, player in pairs(Players:GetPlayers()) do
             checkPlayer(player)
         end
-        
         staffDetectorConnection = Players.PlayerAdded:Connect(function(player)
             checkPlayer(player)
         end)
-        
         Utilities.notification("Acyr v2", "Staff Detector enabled", 2)
     else
         Utilities.notification("Acyr v2", "Staff Detector disabled", 2)
     end
 end
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  SECTION 8: MAIN UI CONSTRUCTION (FULL-SCREEN)
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
+--  SECTION 8: FUN MODULES (Harmless cosmetic features)
+-- ====================================================================
+
+-- BIG HEAD MODULE
+function Modules.bigHead(enabled)
+    local character = Utilities.getCharacter()
+    if not character then return end
+    local head = character:FindFirstChild("Head")
+    if head then
+        if enabled then
+            head.Size = Vector3.new(4, 4, 4)
+        else
+            head.Size = Vector3.new(2, 1, 1)
+        end
+    end
+    Utilities.notification("Acyr v2", enabled and "Big Head ON" or "Big Head OFF", 2)
+end
+
+-- TINY MODULE
+function Modules.tiny(enabled)
+    local character = Utilities.getCharacter()
+    if not character then return end
+    local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+    if humanoid then
+        local bodyScale = {"BodyDepthScale", "BodyHeightScale", "BodyWidthScale", "HeadScale"}
+        for _, scaleName in ipairs(bodyScale) do
+            local scale = humanoid:FindFirstChild(scaleName)
+            if scale then scale.Value = enabled and 0.3 or 1 end
+        end
+    end
+    Utilities.notification("Acyr v2", enabled and "Tiny mode ON" or "Tiny mode OFF", 2)
+end
+
+-- GIANT MODULE
+function Modules.giant(enabled)
+    local character = Utilities.getCharacter()
+    if not character then return end
+    local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+    if humanoid then
+        local bodyScale = {"BodyDepthScale", "BodyHeightScale", "BodyWidthScale", "HeadScale"}
+        for _, scaleName in ipairs(bodyScale) do
+            local scale = humanoid:FindFirstChild(scaleName)
+            if scale then scale.Value = enabled and 3 or 1 end
+        end
+    end
+    Utilities.notification("Acyr v2", enabled and "Giant mode ON" or "Giant mode OFF", 2)
+end
+
+-- RAINBOW MODULE
+local rainbowConnection
+function Modules.rainbow(enabled)
+    if rainbowConnection then rainbowConnection:Disconnect() rainbowConnection = nil end
+    
+    if enabled then
+        local hue = 0
+        rainbowConnection = RunService.Heartbeat:Connect(function(dt)
+            hue = (hue + dt * 0.5) % 1
+            local color = Color3.fromHSV(hue, 1, 1)
+            local character = Utilities.getCharacter()
+            if character then
+                for _, part in pairs(character:GetDescendants()) do
+                    if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                        pcall(function() part.Color = color end)
+                    end
+                end
+            end
+        end)
+        Utilities.notification("Acyr v2", "Rainbow enabled", 2)
+    else
+        Utilities.notification("Acyr v2", "Rainbow disabled", 2)
+    end
+end
+
+-- SPIN MODULE
+local spinConnection
+function Modules.spin(enabled)
+    if spinConnection then spinConnection:Disconnect() spinConnection = nil end
+    
+    if enabled then
+        spinConnection = RunService.Heartbeat:Connect(function(dt)
+            local hrp = Utilities.getHumanoidRootPart()
+            if hrp then
+                hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(360 * dt * 2), 0)
+            end
+        end)
+        Utilities.notification("Acyr v2", "Spin enabled - WHEEE!", 2)
+    else
+        Utilities.notification("Acyr v2", "Spin disabled", 2)
+    end
+end
+
+-- UPSIDE DOWN MODULE
+function Modules.upsideDown(enabled)
+    local hrp = Utilities.getHumanoidRootPart()
+    if hrp then
+        if enabled then
+            hrp.CFrame = hrp.CFrame * CFrame.Angles(math.rad(180), 0, 0)
+        else
+            local pos = hrp.Position
+            hrp.CFrame = CFrame.new(pos) * CFrame.Angles(0, 0, 0)
+        end
+    end
+    Utilities.notification("Acyr v2", enabled and "Upside Down ON" or "Upside Down OFF", 2)
+end
+
+-- HEADLESS MODULE
+local headlessOriginalTransparency
+function Modules.headless(enabled)
+    local character = Utilities.getCharacter()
+    if not character then return end
+    local head = character:FindFirstChild("Head")
+    if head then
+        if enabled then
+            headlessOriginalTransparency = head.Transparency
+            head.Transparency = 1
+            local face = head:FindFirstChild("face") or head:FindFirstChild("Face")
+            if face then face.Transparency = 1 end
+        else
+            head.Transparency = headlessOriginalTransparency or 0
+            local face = head:FindFirstChild("face") or head:FindFirstChild("Face")
+            if face then face.Transparency = 0 end
+        end
+    end
+    Utilities.notification("Acyr v2", enabled and "Headless ON" or "Headless OFF", 2)
+end
+
+-- DISCO MODULE
+local discoConnection
+function Modules.disco(enabled)
+    if discoConnection then discoConnection:Disconnect() discoConnection = nil end
+    
+    if enabled then
+        local hue = 0
+        discoConnection = RunService.Heartbeat:Connect(function(dt)
+            hue = (hue + dt * 2) % 1
+            local color = Color3.fromHSV(hue, 0.8, 1)
+            Lighting.Ambient = color
+            Lighting.OutdoorAmbient = color
+            Lighting.FogColor = color
+        end)
+        Utilities.notification("Acyr v2", "Disco mode ON!", 2)
+    else
+        Lighting.Ambient = Color3.fromRGB(128, 128, 128)
+        Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+        Lighting.FogColor = Color3.fromRGB(192, 192, 192)
+        Utilities.notification("Acyr v2", "Disco mode OFF", 2)
+    end
+end
+
+-- NOODLE ARMS MODULE
+function Modules.noodleArms(enabled)
+    local character = Utilities.getCharacter()
+    if not character then return end
+    local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+    if humanoid then
+        local armWidthScale = humanoid:FindFirstChild("BodyWidthScale")
+        local armDepthScale = humanoid:FindFirstChild("BodyDepthScale")
+        if armWidthScale then armWidthScale.Value = enabled and 0.2 or 1 end
+        if armDepthScale then armDepthScale.Value = enabled and 0.2 or 1 end
+    end
+    Utilities.notification("Acyr v2", enabled and "Noodle Arms ON" or "Noodle Arms OFF", 2)
+end
+
+-- ====================================================================
+--  SECTION 9: MAIN UI CONSTRUCTION (FULL-SCREEN)
+-- ====================================================================
 
 -- Cleanup existing UI
 for _, element in pairs(CoreGui:GetChildren()) do
@@ -1150,7 +1298,6 @@ for _, element in pairs(CoreGui:GetChildren()) do
     end
 end
 
--- Create main screen GUI
 local MainScreenGui = Utilities.createInstance("ScreenGui", {
     Name = "AcyrV2MainUI",
     ResetOnSpawn = false,
@@ -1174,7 +1321,7 @@ local background = Utilities.createInstance("Frame", {
     BorderSizePixel = 0,
 }, MainScreenGui)
 
--- Main container for all category columns (centered)
+-- Main container - columns at TOP of screen
 local mainContainer = Utilities.createInstance("Frame", {
     Name = "MainContainer",
     Size = UDim2.new(1, -80, 1, -80),
@@ -1185,15 +1332,15 @@ local mainContainer = Utilities.createInstance("Frame", {
 
 Utilities.createInstance("UIListLayout", {
     FillDirection = Enum.FillDirection.Horizontal,
-    Padding = UDim.new(0, 16),
+    Padding = UDim.new(0, 12),
     SortOrder = Enum.SortOrder.LayoutOrder,
     HorizontalAlignment = Enum.HorizontalAlignment.Center,
-    VerticalAlignment = Enum.VerticalAlignment.Center,
+    VerticalAlignment = Enum.VerticalAlignment.Top,
 }, mainContainer)
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  SECTION 9: BUILD UI SECTIONS (5 columns like reference)
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
+--  SECTION 10: BUILD UI SECTIONS (6 columns)
+-- ====================================================================
 
 local sections = {}
 local sectionOrder = {}
@@ -1218,28 +1365,19 @@ do
     cpsSlider.LayoutOrder = 2
     cpsSlider.Parent = content
     
-    local triggerbotToggle = UILibrary.createToggle("Trigger Bot", State.triggerbot, COLORS.combat, function(v)
-        State.triggerbot = v
-        persistState()
-    end)
-    triggerbotToggle.LayoutOrder = 3
-    triggerbotToggle.Parent = content
-    
     local aimbotToggle = UILibrary.createToggle("Aim Assist", State.aimbot, COLORS.combat, function(v)
         State.aimbot = v
         Modules.aimbot(v)
         persistState()
     end)
-    aimbotToggle.LayoutOrder = 4
+    aimbotToggle.LayoutOrder = 3
     aimbotToggle.Parent = content
     
-    local silentAimToggle = UILibrary.createToggle("Silent Aim", State.silent_aim, COLORS.combat, function(v)
-        State.silent_aim = v
-        Modules.silentAim(v)
-        persistState()
+    local aimbotFovSlider = UILibrary.createSlider("Aim FOV", 20, 300, State.aimbot_fov, function(v)
+        State.aimbot_fov = v
     end)
-    silentAimToggle.LayoutOrder = 5
-    silentAimToggle.Parent = content
+    aimbotFovSlider.LayoutOrder = 4
+    aimbotFovSlider.Parent = content
     
     sections.combat = {section = section, content = content}
     table.insert(sectionOrder, section)
@@ -1267,19 +1405,12 @@ do
     xrayToggle.LayoutOrder = 2
     xrayToggle.Parent = content
     
-    local chamsToggle = UILibrary.createToggle("Chams", State.chams, COLORS.render, function(v)
-        State.chams = v
-        persistState()
-    end)
-    chamsToggle.LayoutOrder = 3
-    chamsToggle.Parent = content
-    
     local fullbrightToggle = UILibrary.createToggle("Fullbright", State.fullbright, COLORS.render, function(v)
         State.fullbright = v
         Modules.fullbright(v)
         persistState()
     end)
-    fullbrightToggle.LayoutOrder = 4
+    fullbrightToggle.LayoutOrder = 3
     fullbrightToggle.Parent = content
     
     local stretchedToggle = UILibrary.createToggle("Stretched Res", State.stretched, COLORS.render, function(v)
@@ -1287,24 +1418,15 @@ do
         Modules.stretched(v)
         persistState()
     end)
-    stretchedToggle.LayoutOrder = 5
+    stretchedToggle.LayoutOrder = 4
     stretchedToggle.Parent = content
     
     local stretchedFOVSlider = UILibrary.createSlider("Stretched FOV", 70, 140, State.stretched_fov, function(v)
         State.stretched_fov = v
-        if State.stretched then
-            Camera.FieldOfView = v
-        end
+        if State.stretched then Camera.FieldOfView = v end
     end)
-    stretchedFOVSlider.LayoutOrder = 6
+    stretchedFOVSlider.LayoutOrder = 5
     stretchedFOVSlider.Parent = content
-    
-    local tracersToggle = UILibrary.createToggle("Tracers", State.tracers, COLORS.render, function(v)
-        State.tracers = v
-        persistState()
-    end)
-    tracersToggle.LayoutOrder = 7
-    tracersToggle.Parent = content
     
     sections.render = {section = section, content = content}
     table.insert(sectionOrder, section)
@@ -1393,20 +1515,12 @@ do
     section.LayoutOrder = 4
     section.Parent = mainContainer
     
-    local antiFlashToggle = UILibrary.createToggle("Anti Flashbang", State.anti_flashbang, COLORS.player, function(v)
-        State.anti_flashbang = v
-        Modules.antiFlashbang(v)
-        persistState()
-    end)
-    antiFlashToggle.LayoutOrder = 1
-    antiFlashToggle.Parent = content
-    
     local staffDetectorToggle = UILibrary.createToggle("Staff Detector", State.staff_detector, COLORS.player, function(v)
         State.staff_detector = v
         Modules.staffDetector(v)
         persistState()
     end)
-    staffDetectorToggle.LayoutOrder = 2
+    staffDetectorToggle.LayoutOrder = 1
     staffDetectorToggle.Parent = content
     
     local thirdPersonToggle = UILibrary.createToggle("Third Person", State.third_person, COLORS.player, function(v)
@@ -1414,7 +1528,7 @@ do
         Modules.thirdPerson(v)
         persistState()
     end)
-    thirdPersonToggle.LayoutOrder = 3
+    thirdPersonToggle.LayoutOrder = 2
     thirdPersonToggle.Parent = content
     
     local airJumpToggle = UILibrary.createToggle("Air Jump", State.air_jump, COLORS.player, function(v)
@@ -1422,7 +1536,7 @@ do
         Modules.airJump(v)
         persistState()
     end)
-    airJumpToggle.LayoutOrder = 4
+    airJumpToggle.LayoutOrder = 3
     airJumpToggle.Parent = content
     
     local antiKBToggle = UILibrary.createToggle("Anti Knockback", State.anti_kb, COLORS.player, function(v)
@@ -1430,7 +1544,7 @@ do
         Modules.antiKB(v)
         persistState()
     end)
-    antiKBToggle.LayoutOrder = 5
+    antiKBToggle.LayoutOrder = 4
     antiKBToggle.Parent = content
     
     local godmodeToggle = UILibrary.createToggle("Godmode", State.godmode, COLORS.player, function(v)
@@ -1438,7 +1552,7 @@ do
         Modules.godmode(v)
         persistState()
     end)
-    godmodeToggle.LayoutOrder = 6
+    godmodeToggle.LayoutOrder = 5
     godmodeToggle.Parent = content
     
     local invisibleToggle = UILibrary.createToggle("Invisible", State.invisible, COLORS.player, function(v)
@@ -1446,75 +1560,201 @@ do
         Modules.invisible(v)
         persistState()
     end)
-    invisibleToggle.LayoutOrder = 7
+    invisibleToggle.LayoutOrder = 6
     invisibleToggle.Parent = content
     
     sections.player = {section = section, content = content}
     table.insert(sectionOrder, section)
 end
 
--- OTHER SECTION
+-- SETTINGS SECTION
 do
-    local section, content = UILibrary.createSection("Other", COLORS.other)
+    local section, content = UILibrary.createSection("Settings", COLORS.settings)
     section.LayoutOrder = 5
     section.Parent = mainContainer
     
-    local autoReloadToggle = UILibrary.createToggle("Auto Reload", State.auto_reload, COLORS.other, function(v)
-        State.auto_reload = v
+    local notifToggle = UILibrary.createToggle("Notifications", State.notifications, COLORS.settings, function(v)
+        State.notifications = v
         persistState()
     end)
-    autoReloadToggle.LayoutOrder = 1
-    autoReloadToggle.Parent = content
+    notifToggle.LayoutOrder = 1
+    notifToggle.Parent = content
     
-    local deviceSpoofToggle = UILibrary.createToggle("Device Spoof", State.device_spoof, COLORS.other, function(v)
-        State.device_spoof = v
+    local clickSoundToggle = UILibrary.createToggle("Click Sounds", State.click_sounds, COLORS.settings, function(v)
+        State.click_sounds = v
         persistState()
     end)
-    deviceSpoofToggle.LayoutOrder = 2
-    deviceSpoofToggle.Parent = content
+    clickSoundToggle.LayoutOrder = 2
+    clickSoundToggle.Parent = content
     
-    local antiKatanaToggle = UILibrary.createToggle("Anti Katana", State.anti_katana, COLORS.other, function(v)
-        State.anti_katana = v
+    local arraylistToggle = UILibrary.createToggle("ArrayList", State.arraylist, COLORS.settings, function(v)
+        State.arraylist = v
         persistState()
     end)
-    antiKatanaToggle.LayoutOrder = 3
-    antiKatanaToggle.Parent = content
+    arraylistToggle.LayoutOrder = 3
+    arraylistToggle.Parent = content
     
-    local targetHudToggle = UILibrary.createToggle("Target HUD", State.target_hud, COLORS.other, function(v)
+    local targetHudToggle = UILibrary.createToggle("Target HUD", State.target_hud, COLORS.settings, function(v)
         State.target_hud = v
         persistState()
     end)
     targetHudToggle.LayoutOrder = 4
     targetHudToggle.Parent = content
     
-    local fastShootToggle = UILibrary.createToggle("Fast Shoot", State.fast_shoot, COLORS.other, function(v)
-        State.fast_shoot = v
-        persistState()
-    end)
-    fastShootToggle.LayoutOrder = 5
-    fastShootToggle.Parent = content
+    local versionLabel = UILibrary.createInfoLabel("Acyr v" .. CONFIG.VERSION, COLORS.text)
+    versionLabel.LayoutOrder = 10
+    versionLabel.Parent = content
     
-    local autoPlayToggle = UILibrary.createToggle("Auto Play", State.auto_play, COLORS.other, function(v)
-        State.auto_play = v
-        persistState()
-    end)
-    autoPlayToggle.LayoutOrder = 6
-    autoPlayToggle.Parent = content
+    local creditsLabel = UILibrary.createInfoLabel("Made by Acy", COLORS.textDark)
+    creditsLabel.LayoutOrder = 11
+    creditsLabel.Parent = content
     
-    local arraylistToggle = UILibrary.createToggle("ArrayList", State.arraylist, COLORS.other, function(v)
-        State.arraylist = v
-        persistState()
-    end)
-    arraylistToggle.LayoutOrder = 7
-    arraylistToggle.Parent = content
+    local keybindsLabel = UILibrary.createInfoLabel("J: Menu | F: Fly | N: Noclip", COLORS.textDark)
+    keybindsLabel.LayoutOrder = 12
+    keybindsLabel.Parent = content
     
-    sections.other = {section = section, content = content}
+    local panicLabel = UILibrary.createInfoLabel("Delete: Panic (disable all)", COLORS.error)
+    panicLabel.LayoutOrder = 13
+    panicLabel.Parent = content
+    
+    local resetBtn = UILibrary.createButton("Reset All Settings", UDim2.new(1, 0, 0, 32), COLORS.error, function()
+        for key, value in pairs(State) do
+            if type(value) == "boolean" then
+                State[key] = false
+            end
+        end
+        State.notifications = true
+        State.click_sounds = true
+        State.arraylist = true
+        State.fly_speed = 50
+        State.speed_val = 50
+        State.blink_speed = 30
+        State.stretched_fov = 120
+        State.autoclicker_cps = 10
+        State.aimbot_fov = 100
+        
+        Modules.fly(false)
+        Modules.noclip(false)
+        Modules.speed(false)
+        Modules.blink(false)
+        Modules.esp(false)
+        Modules.xray(false)
+        Modules.fullbright(false)
+        Modules.aimbot(false)
+        Modules.spider(false)
+        Modules.bunnyHop(false)
+        Modules.airJump(false)
+        Modules.antiKB(false)
+        Modules.staffDetector(false)
+        Modules.godmode(false)
+        Modules.invisible(false)
+        Modules.autoClicker(false)
+        Modules.bigHead(false)
+        Modules.tiny(false)
+        Modules.giant(false)
+        Modules.rainbow(false)
+        Modules.spin(false)
+        Modules.disco(false)
+        Modules.headless(false)
+        Modules.noodleArms(false)
+        
+        persistState()
+        Utilities.notification("Acyr v2", "All settings reset!", 3)
+    end)
+    resetBtn.LayoutOrder = 20
+    resetBtn.Parent = content
+    
+    sections.settings = {section = section, content = content}
     table.insert(sectionOrder, section)
 end
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  SECTION 10: ARRAYLIST (RIGHT SIDE - Active modules list)
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- FUN SECTION
+do
+    local section, content = UILibrary.createSection("Fun", COLORS.fun)
+    section.LayoutOrder = 6
+    section.Parent = mainContainer
+    
+    local bigHeadToggle = UILibrary.createToggle("Big Head", State.big_head, COLORS.fun, function(v)
+        State.big_head = v
+        Modules.bigHead(v)
+        persistState()
+    end)
+    bigHeadToggle.LayoutOrder = 1
+    bigHeadToggle.Parent = content
+    
+    local tinyToggle = UILibrary.createToggle("Tiny", State.tiny, COLORS.fun, function(v)
+        State.tiny = v
+        if v then State.giant = false end
+        Modules.tiny(v)
+        persistState()
+    end)
+    tinyToggle.LayoutOrder = 2
+    tinyToggle.Parent = content
+    
+    local giantToggle = UILibrary.createToggle("Giant", State.giant, COLORS.fun, function(v)
+        State.giant = v
+        if v then State.tiny = false end
+        Modules.giant(v)
+        persistState()
+    end)
+    giantToggle.LayoutOrder = 3
+    giantToggle.Parent = content
+    
+    local rainbowToggle = UILibrary.createToggle("Rainbow", State.rainbow, COLORS.fun, function(v)
+        State.rainbow = v
+        Modules.rainbow(v)
+        persistState()
+    end)
+    rainbowToggle.LayoutOrder = 4
+    rainbowToggle.Parent = content
+    
+    local spinToggle = UILibrary.createToggle("Spin", State.spin, COLORS.fun, function(v)
+        State.spin = v
+        Modules.spin(v)
+        persistState()
+    end)
+    spinToggle.LayoutOrder = 5
+    spinToggle.Parent = content
+    
+    local upsideDownToggle = UILibrary.createToggle("Upside Down", State.upside_down, COLORS.fun, function(v)
+        State.upside_down = v
+        Modules.upsideDown(v)
+        persistState()
+    end)
+    upsideDownToggle.LayoutOrder = 6
+    upsideDownToggle.Parent = content
+    
+    local headlessToggle = UILibrary.createToggle("Headless", State.headless, COLORS.fun, function(v)
+        State.headless = v
+        Modules.headless(v)
+        persistState()
+    end)
+    headlessToggle.LayoutOrder = 7
+    headlessToggle.Parent = content
+    
+    local discoToggle = UILibrary.createToggle("Disco", State.disco, COLORS.fun, function(v)
+        State.disco = v
+        Modules.disco(v)
+        persistState()
+    end)
+    discoToggle.LayoutOrder = 8
+    discoToggle.Parent = content
+    
+    local noodleToggle = UILibrary.createToggle("Noodle Arms", State.noodle_arms, COLORS.fun, function(v)
+        State.noodle_arms = v
+        Modules.noodleArms(v)
+        persistState()
+    end)
+    noodleToggle.LayoutOrder = 9
+    noodleToggle.Parent = content
+    
+    sections.fun = {section = section, content = content}
+    table.insert(sectionOrder, section)
+end
+
+-- ====================================================================
+--  SECTION 11: ARRAYLIST (RIGHT SIDE)
+-- ====================================================================
 
 local arrayListContainer = Utilities.createInstance("Frame", {
     Name = "ArrayList",
@@ -1539,18 +1779,14 @@ Utilities.createInstance("UIPadding", {
 local arrayListLabels = {}
 
 local function updateArrayList()
-    -- Clear existing labels
     for _, label in pairs(arrayListLabels) do
-        if label and label.Parent then
-            label:Destroy()
-        end
+        if label and label.Parent then label:Destroy() end
     end
     arrayListLabels = {}
     
     if not State.arraylist then return end
     
     local activeModules = {}
-    
     local moduleNames = {
         {key = "fly", name = "Fly"},
         {key = "noclip", name = "Noclip"},
@@ -1562,27 +1798,26 @@ local function updateArrayList()
         {key = "xray", name = "XRay"},
         {key = "stretched", name = "Stretched"},
         {key = "fullbright", name = "Fullbright"},
-        {key = "chams", name = "Chams"},
-        {key = "tracers", name = "Tracers"},
         {key = "autoclicker", name = "AutoClicker"},
         {key = "aimbot", name = "AimAssist"},
-        {key = "silent_aim", name = "SilentAim"},
         {key = "godmode", name = "Godmode"},
         {key = "invisible", name = "Invisible"},
         {key = "anti_kb", name = "AntiKB"},
         {key = "third_person", name = "ThirdPerson"},
         {key = "air_jump", name = "AirJump"},
-        {key = "anti_flashbang", name = "AntiFlash"},
         {key = "staff_detector", name = "StaffDetect"},
-        {key = "device_spoof", name = "DeviceSpoof"},
-        {key = "auto_reload", name = "AutoReload"},
-        {key = "anti_katana", name = "AntiKatana"},
-        {key = "fast_shoot", name = "FastShoot"},
-        {key = "auto_play", name = "AutoPlay"},
         {key = "target_hud", name = "TargetHUD"},
+        {key = "big_head", name = "BigHead"},
+        {key = "tiny", name = "Tiny"},
+        {key = "giant", name = "Giant"},
+        {key = "rainbow", name = "Rainbow"},
+        {key = "spin", name = "Spin"},
+        {key = "upside_down", name = "UpsideDown"},
+        {key = "headless", name = "Headless"},
+        {key = "disco", name = "Disco"},
+        {key = "noodle_arms", name = "NoodleArms"},
     }
     
-    -- Sort by name length (longest first) for visual effect
     for _, mod in ipairs(moduleNames) do
         if State[mod.key] then
             table.insert(activeModules, mod.name)
@@ -1606,15 +1841,12 @@ local function updateArrayList()
         }, arrayListContainer)
         
         Utilities.createInstance("UICorner", {CornerRadius = UDim.new(0, 3)}, label)
-        Utilities.createInstance("UIPadding", {
-            PaddingRight = UDim.new(0, 6),
-        }, label)
+        Utilities.createInstance("UIPadding", {PaddingRight = UDim.new(0, 6)}, label)
         
         table.insert(arrayListLabels, label)
     end
 end
 
--- Update arraylist periodically
 task.spawn(function()
     while true do
         updateArrayList()
@@ -1622,10 +1854,10 @@ task.spawn(function()
     end
 end)
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  SECTION 11: UI ANIMATION & STATE MANAGEMENT
---  Full-screen pop-in with staggered column animations
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
+--  SECTION 12: UI ANIMATION & STATE MANAGEMENT
+--  Columns fly UP from below into position at the top
+-- ====================================================================
 
 local UIState = {
     isOpen = false,
@@ -1638,30 +1870,22 @@ local function animateUIIn()
     UIState.isAnimating = true
     
     MainScreenGui.Enabled = true
+    Utilities.playSound(SOUNDS.OPEN, 0.6, 1.0)
     
-    -- Fade in the dark background overlay
     background.BackgroundTransparency = 1
     Utilities.tween(background, CONFIG.ANIMATION_SPEED, {
         BackgroundTransparency = 0.35,
     })
     
-    -- Staggered animation for each section column
-    -- Each section slides up from below with a scale effect
     for i, section in ipairs(sectionOrder) do
-        -- Start position: below and scaled down
-        section.Position = UDim2.new(0, 0, 0, 60)
+        section.Position = UDim2.new(0, 0, 0, 120)
         section.Size = UDim2.new(0, CONFIG.SECTION_WIDTH, 0, CONFIG.SECTION_HEIGHT)
         
-        -- Make invisible initially
         for _, child in pairs(section:GetDescendants()) do
-            if child:IsA("GuiObject") then
-                child.Visible = true
-            end
+            if child:IsA("GuiObject") then child.Visible = true end
         end
         
-        -- Stagger the animation with delay per column
         task.delay((i - 1) * CONFIG.STAGGER_DELAY, function()
-            -- Slide up and scale in with a bounce effect
             Utilities.tweenBack(section, CONFIG.ANIMATION_SPEED + 0.1, {
                 Position = UDim2.new(0, 0, 0, 0),
             })
@@ -1678,19 +1902,19 @@ local function animateUIOut()
     UIState.isOpen = false
     UIState.isAnimating = true
     
-    -- Staggered exit animation (reverse order for satisfying feel)
+    Utilities.playSound(SOUNDS.CLOSE, 0.4, 0.8)
+    
     for i = #sectionOrder, 1, -1 do
         local section = sectionOrder[i]
         local reverseIndex = #sectionOrder - i
         
         task.delay(reverseIndex * CONFIG.STAGGER_DELAY, function()
             Utilities.tween(section, CONFIG.ANIMATION_SPEED * 0.8, {
-                Position = UDim2.new(0, 0, 0, 80),
+                Position = UDim2.new(0, 0, 0, 120),
             }, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
         end)
     end
     
-    -- Fade out background
     Utilities.tween(background, CONFIG.ANIMATION_SPEED, {
         BackgroundTransparency = 1,
     })
@@ -1701,9 +1925,9 @@ local function animateUIOut()
     end)
 end
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  SECTION 12: KEYBINDS & INPUT HANDLING
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
+--  SECTION 13: KEYBINDS & INPUT HANDLING
+-- ====================================================================
 
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
@@ -1723,14 +1947,13 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         Modules.noclip(State.noclip)
         persistState()
     elseif input.KeyCode == Enum.KeyCode.Delete then
-        -- Panic button - disable everything
         for key, value in pairs(State) do
-            if type(value) == "boolean" then
-                State[key] = false
-            end
+            if type(value) == "boolean" then State[key] = false end
         end
+        State.notifications = true
+        State.click_sounds = true
+        State.arraylist = true
         
-        -- Disable all active modules
         Modules.fly(false)
         Modules.noclip(false)
         Modules.speed(false)
@@ -1743,11 +1966,18 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         Modules.bunnyHop(false)
         Modules.airJump(false)
         Modules.antiKB(false)
-        Modules.antiFlashbang(false)
         Modules.staffDetector(false)
         Modules.godmode(false)
         Modules.invisible(false)
         Modules.autoClicker(false)
+        Modules.bigHead(false)
+        Modules.tiny(false)
+        Modules.giant(false)
+        Modules.rainbow(false)
+        Modules.spin(false)
+        Modules.disco(false)
+        Modules.headless(false)
+        Modules.noodleArms(false)
         
         animateUIOut()
         Utilities.notification("Acyr v2", "PANIC - All features disabled", 3)
@@ -1755,14 +1985,12 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  SECTION 13: AUTO-LOAD & INITIALIZATION
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
+--  SECTION 14: AUTO-LOAD & INITIALIZATION
+-- ====================================================================
 
 task.spawn(function()
     task.wait(0.5)
-    
-    -- Auto-load enabled settings
     if State.fly then Modules.fly(true) end
     if State.noclip then Modules.noclip(true) end
     if State.speed then Modules.speed(true) end
@@ -1780,14 +2008,20 @@ task.spawn(function()
     if State.invisible then Modules.invisible(true) end
     if State.air_jump then Modules.airJump(true) end
     if State.anti_kb then Modules.antiKB(true) end
-    if State.anti_flashbang then Modules.antiFlashbang(true) end
     if State.staff_detector then Modules.staffDetector(true) end
+    if State.big_head then Modules.bigHead(true) end
+    if State.tiny then Modules.tiny(true) end
+    if State.giant then Modules.giant(true) end
+    if State.rainbow then Modules.rainbow(true) end
+    if State.spin then Modules.spin(true) end
+    if State.disco then Modules.disco(true) end
+    if State.headless then Modules.headless(true) end
+    if State.noodle_arms then Modules.noodleArms(true) end
 end)
 
--- Respawn handler - re-enable active modules
+-- Respawn handler
 LocalPlayer.CharacterAdded:Connect(function()
     task.wait(0.5)
-    
     if State.fly then Modules.fly(true) end
     if State.noclip then Modules.noclip(true) end
     if State.speed then Modules.speed(true) end
@@ -1795,24 +2029,26 @@ LocalPlayer.CharacterAdded:Connect(function()
     if State.blink then Modules.blink(true) end
     if State.air_jump then Modules.airJump(true) end
     if State.anti_kb then Modules.antiKB(true) end
+    if State.big_head then Modules.bigHead(true) end
+    if State.rainbow then Modules.rainbow(true) end
+    if State.spin then Modules.spin(true) end
 end)
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  SECTION 14: INITIALIZATION & STARTUP MESSAGE
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
+--  SECTION 15: INITIALIZATION & STARTUP MESSAGE
+-- ====================================================================
 
--- Start UI disabled (toggle with J)
 MainScreenGui.Enabled = false
 
 Utilities.notification("Acyr v2", "Loaded successfully!", 3)
 Utilities.notification("Acyr v2", "Press J to toggle UI | F to fly | N to noclip | Delete to panic", 5)
 
 print("[Acyr v2] Script loaded successfully!")
-print("[Acyr v2] 1800+ lines of advanced features")
+print("[Acyr v2] Version " .. CONFIG.VERSION)
 print("[Acyr v2] Full-screen UI with smooth staggered animations")
 print("[Acyr v2] All modules active and ready")
 print("[Acyr v2] Press J to open the menu")
 
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  END OF SCRIPT (1800+ lines)
--- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ====================================================================
+--  END OF SCRIPT
+-- ====================================================================
