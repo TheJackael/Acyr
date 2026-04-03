@@ -1814,5 +1814,5 @@ print("[Acyr v2] All modules active and ready")
 print("[Acyr v2] Press J to open the menu")
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
---  END OF SCRIPT (2500+ lines)
+--  END OF SCRIPT (1800+ lines)
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
