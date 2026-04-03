@@ -1,14 +1,14 @@
 --[[
   ╔══════════════════════════════════════════════════════════════╗
   ║             A C Y R   v 2   -   P R O F E S S I O N A L     ║
-  ║                Made by Acy - 2500+ Lines                     ║
+  ║                Made by Acy - 1800+ Lines                     ║
   ║           Full UI Library + Advanced Modules                 ║
   ║           github.com/TheJackael/Acyr                         ║
   ╚══════════════════════════════════════════════════════════════╝
 
   FEATURES:
   - Professional full-screen UI with smooth staggered animations
-  - 2500+ lines of code
+  - 1800+ lines of code
   - Advanced modules: Fly, Noclip, Speed, XRay, Blink, ESP, Aimbot
   - Customizable sliders, toggles, dropdowns
   - Persistent settings
@@ -149,7 +149,7 @@ local State = {
     -- Other
     auto_reload = Settings.auto_reload or false,
     target_hud = Settings.target_hud or false,
-    arraylist = Settings.arraylist or true,
+    arraylist = (Settings.arraylist ~= nil) and Settings.arraylist or true,
     anti_flashbang = Settings.anti_flashbang or false,
     staff_detector = Settings.staff_detector or false,
     device_spoof = Settings.device_spoof or false,
@@ -1808,7 +1808,7 @@ Utilities.notification("Acyr v2", "Loaded successfully!", 3)
 Utilities.notification("Acyr v2", "Press J to toggle UI | F to fly | N to noclip | Delete to panic", 5)
 
 print("[Acyr v2] Script loaded successfully!")
-print("[Acyr v2] 2500+ lines of advanced features")
+print("[Acyr v2] 1800+ lines of advanced features")
 print("[Acyr v2] Full-screen UI with smooth staggered animations")
 print("[Acyr v2] All modules active and ready")
 print("[Acyr v2] Press J to open the menu")
