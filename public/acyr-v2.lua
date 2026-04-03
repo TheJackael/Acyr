@@ -895,7 +895,7 @@ function Modules.autoClicker(enabled)
                 end)
             end
         end)
-        Utilities.notification("Acyr v2", "AutoClicker enabled (" .. cps .. " CPS)", 2)
+        Utilities.notification("Acyr v2", "AutoClicker enabled (" .. math.floor(State.autoclicker_cps or 10) .. " CPS)", 2)
     else
         Utilities.notification("Acyr v2", "AutoClicker disabled", 2)
     end
