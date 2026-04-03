@@ -506,7 +506,7 @@ function UILibrary.createSlider(label, minValue, maxValue, initialValue, callbac
     end)
     
     UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and dragging then
             dragging = false
             persistState()
         end
@@ -882,9 +882,9 @@ function Modules.autoClicker(enabled)
     
     if enabled then
         local elapsed = 0
-        local cps = State.autoclicker_cps or 10
         
         autoclickerConnection = RunService.Heartbeat:Connect(function(deltaTime)
+            local cps = State.autoclicker_cps or 10
             elapsed = elapsed + deltaTime
             if elapsed >= 1 / cps then
                 elapsed = 0
@@ -903,8 +903,15 @@ end
 
 -- ESP MODULE
 local espFolder
+local espPlayerAddedConnection
+local espCharacterConnections = {}
 function Modules.esp(enabled)
     if espFolder then espFolder:Destroy() espFolder = nil end
+    if espPlayerAddedConnection then espPlayerAddedConnection:Disconnect() espPlayerAddedConnection = nil end
+    for _, conn in pairs(espCharacterConnections) do
+        if conn then conn:Disconnect() end
+    end
+    espCharacterConnections = {}
     
     if enabled then
         espFolder = Utilities.createInstance("Folder", {Name = "AcyrESP"}, workspace)
@@ -923,11 +930,12 @@ function Modules.esp(enabled)
             createESPBox(player)
         end
         
-        Players.PlayerAdded:Connect(function(player)
-            player.CharacterAdded:Connect(function()
+        espPlayerAddedConnection = Players.PlayerAdded:Connect(function(player)
+            local charConn = player.CharacterAdded:Connect(function()
                 task.wait(0.5)
                 if State.esp then createESPBox(player) end
             end)
+            table.insert(espCharacterConnections, charConn)
         end)
         Utilities.notification("Acyr v2", "ESP enabled", 2)
     else
