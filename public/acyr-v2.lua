@@ -928,6 +928,11 @@ function Modules.esp(enabled)
         
         for _, player in pairs(Players:GetPlayers()) do
             createESPBox(player)
+            local charConn = player.CharacterAdded:Connect(function()
+                task.wait(0.5)
+                if State.esp then createESPBox(player) end
+            end)
+            table.insert(espCharacterConnections, charConn)
         end
         
         espPlayerAddedConnection = Players.PlayerAdded:Connect(function(player)
